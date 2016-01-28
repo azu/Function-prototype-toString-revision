@@ -1,0 +1,154 @@
+<!doctype html>
+<head><meta charset="utf-8">
+<link rel="stylesheet" href="ecmarkup.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+<script src="ecmarkup.js"></script>
+<title>Function.prototype.toString revision</title><script type="application/json" id="menu-search-biblio">[{"type":"clause","id":"","aoid":null,"title":"Introduction","number":"","location":"","key":"Introduction"},{"type":"clause","id":"sec-function.prototype.tostring","aoid":null,"title":"(19.2.3.5) Function.prototype.toString()","number":"1","location":"","key":"(19.2.3.5) Function.prototype.toString()"},{"type":"clause","id":"sec-method-definitions","aoid":null,"title":"(14.3) Method Definitions","number":"2","location":"","key":"(14.3) Method Definitions"},{"type":"clause","id":"sec-copyright-and-software-license","aoid":null,"title":"Copyright & Software License","number":"A","location":"","key":"Copyright & Software License"},{"type":"production","id":"prod-NativeFunction","name":"NativeFunction","location":"","key":"NativeFunction"},{"type":"production","id":"prod-MethodDefinition","name":"MethodDefinition","location":"","key":"MethodDefinition"},{"type":"production","id":"prod-Getter","name":"Getter","location":"","key":"Getter"},{"type":"production","id":"prod-Setter","name":"Setter","location":"","key":"Setter"}]</script></head><body><div id="menu-toggle">☰</div><div id="menu"><div id="menu-search"><input type="text" id="menu-search-box" placeholder="Search..."><div id="menu-search-results" class="inactive"></div></div><div id="menu-toc"><ol class="toc"><li><span class="item-toggle-none"></span><a href="#" title="Introduction"><span class="secnum"></span> Introduction</a></li><li><span class="item-toggle-none"></span><a href="#sec-function.prototype.tostring" title="(19.2.3.5) Function.prototype.toString()"><span class="secnum">1</span> (19.2.3.5) Function.prototype.toString()</a></li><li><span class="item-toggle-none"></span><a href="#sec-method-definitions" title="(14.3) Method Definitions"><span class="secnum">2</span> (14.3) Method Definitions</a></li><li><span class="item-toggle-none"></span><a href="#sec-copyright-and-software-license" title="Copyright &amp; Software License"><span class="secnum">A</span> Copyright &amp; Software License</a></li></ol></div></div><h1 class="version">Stage 1 Draft / January 28, 2016</h1><h1 class="title">Function.prototype.toString revision</h1>
+
+<emu-intro>
+  <h1><span class="secnum"></span>Introduction<span class="utils"><span class="anchor"><a href="#">#</a></span></span></h1>
+  <h2>Goals</h2>
+
+  <p>The original goals of this proposal were</p>
+
+  <ul>
+    <li>
+      remove the forward-incompatible requirement
+      
+      <blockquote>
+        If the implementation cannot produce a source code string that meets these criteria then it must return a string for which <code>eval</code> will throw a <emu-val>SyntaxError</emu-val> exception.
+      
+      </blockquote>
+    </li><li>clarify the "functionally equivalent" requirement
+    
+    </li><li>standardise the string representation of built-in functions and host objects
+    
+    </li><li>clarify requirement of representation based on the "actual characteristics" of an object
+  
+  </li></ul>
+
+  <p>The revised goals of this proposal also include</p>
+
+  <ul>
+    <li>ensure that the string's parse contains the same function body and parameter list as the original
+  
+  </li></ul>
+</emu-intro>
+
+<!-- es6num="19.2.3.5" -->
+<emu-clause id="sec-function.prototype.tostring">
+  <h1><span class="secnum">1</span>(<a href="http://tc39.github.io/ecma262/#sec-function.prototype.tostring">19.2.3.5</a>) Function.prototype.toString()<span class="utils"><span class="anchor"><a href="#sec-function.prototype.tostring">#</a></span></span></h1>
+
+  <p>When the <code>toString</code> method is called with an object <var>func</var> as its <emu-val>this</emu-val> value, the following steps are taken:</p>
+
+  <del class="block">
+    <emu-alg><ol><li>If <var>func</var> is a Bound Function exotic object, then<ol><li>Return an implementation-dependent String source code representation of <var>func</var>. The representation must conform to the rules below. It is implementation dependent whether the representation includes <emu-xref href="#sec-bound-function-exotic-objects"><a href="https://tc39.github.io/ecma262#sec-bound-function-exotic-objects">bound function</a></emu-xref> information or information about the target function.</li></ol></li><li>If <emu-xref aoid="Type"><a href="https://tc39.github.io/ecma262#sec-ecmascript-data-types-and-values">Type</a></emu-xref>(<var>func</var>) is Object and is either a built-in function object or has an [[ECMAScriptCode]] internal slot, then<ol><li>Return an implementation-dependent String source code representation of <var>func</var>. The representation must conform to the rules below.</li></ol></li><li>Throw a <emu-val>TypeError</emu-val> exception.
+    </li></ol></emu-alg>
+    <p><code>toString</code> Representation Requirements:</p>
+    <ul>
+      <li>The string representation must have the syntax of a <emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionDeclaration">FunctionDeclaration</a></emu-nt>, <emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionExpression">FunctionExpression</a></emu-nt>, <emu-nt><a href="https://tc39.github.io/ecma262#prod-GeneratorDeclaration">GeneratorDeclaration</a></emu-nt>, <emu-nt><a href="https://tc39.github.io/ecma262#prod-GeneratorExpression">GeneratorExpression</a></emu-nt>, <emu-nt><a href="https://tc39.github.io/ecma262#prod-ClassDeclaration">ClassDeclaration</a></emu-nt>, <emu-nt><a href="https://tc39.github.io/ecma262#prod-ClassExpression">ClassExpression</a></emu-nt>, <emu-nt><a href="https://tc39.github.io/ecma262#prod-ArrowFunction">ArrowFunction</a></emu-nt>, <emu-nt><a href="#prod-MethodDefinition">MethodDefinition</a></emu-nt>, or <emu-nt><a href="https://tc39.github.io/ecma262#prod-GeneratorMethod">GeneratorMethod</a></emu-nt> depending upon the actual characteristics of the object.
+      
+      </li><li>The use and placement of white space, line terminators, and semicolons within the representation String is implementation-dependent.
+      
+      </li><li>If the object was defined using ECMAScript code and the returned string representation is not in the form of a <emu-nt><a href="#prod-MethodDefinition">MethodDefinition</a></emu-nt> or <emu-nt><a href="https://tc39.github.io/ecma262#prod-GeneratorMethod">GeneratorMethod</a></emu-nt> then the representation must be such that if the string is evaluated, using <code>eval</code> in a lexical context that is equivalent to the lexical context used to create the original object, it will result in a new functionally equivalent object. In that case the returned source code must not mention freely any variables that were not mentioned freely by the original function's source code, even if these “extra” names were originally in scope.
+      
+      </li><li>If the implementation cannot produce a source code string that meets these criteria then it must return a string for which <code>eval</code> will throw a <emu-val>SyntaxError</emu-val> exception.
+    
+    </li></ul>
+  </del>
+
+  <ins class="block">
+    <emu-alg><ol><li>If <var>func</var> is a Bound Function exotic object, then return an implementation-dependent string source code representation of <var>func</var>. It is implementation dependent whether the representation includes <emu-xref href="#sec-bound-function-exotic-objects"><a href="https://tc39.github.io/ecma262#sec-bound-function-exotic-objects">bound function</a></emu-xref> information or information about the target function. The representation must conform to the <code>toString</code> Representation Requirements below.</li><li>If <emu-xref aoid="Type"><a href="https://tc39.github.io/ecma262#sec-ecmascript-data-types-and-values">Type</a></emu-xref>(<var>func</var>) is Object and <emu-xref aoid="IsCallable"><a href="https://tc39.github.io/ecma262#sec-iscallable">IsCallable</a></emu-xref>(<var>func</var>) is <emu-val>true</emu-val>, then return an implementation-dependent string source code representation of <var>func</var>. The representation must conform to the <code>toString</code> Representation Requirements below.</li><li>Throw a <emu-val>TypeError</emu-val> exception.
+    </li></ol></emu-alg>
+
+    <p><code>toString</code> Representation Requirements:</p>
+
+    <ul>
+      <li>If <var>func</var> was defined using <emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionExpression">FunctionExpression</a></emu-nt> or <emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionDeclaration">FunctionDeclaration</a></emu-nt>, then a parse of the string representation using <emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionExpression">FunctionExpression</a></emu-nt> as the goal symbol must succeed with a parse tree having <var>func</var>.[[ECMAScriptCode]] in the <emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionBody">FunctionBody</a></emu-nt> position and <var>func</var>.[[FormalParameters]] in the <emu-nt><a href="https://tc39.github.io/ecma262#prod-FormalParameters">FormalParameters</a></emu-nt> position.
+      
+      </li><li>Else if <var>func</var> was defined using <emu-nt><a href="https://tc39.github.io/ecma262#prod-ClassExpression">ClassExpression</a></emu-nt> or <emu-nt><a href="https://tc39.github.io/ecma262#prod-ClassDeclaration">ClassDeclaration</a></emu-nt>,
+        
+        <ul>
+          <li>If a parse of  <code>constructor(...args){ super(...args); }</code> or  <code>constructor(){}</code> using <emu-nt><a href="#prod-MethodDefinition">MethodDefinition</a></emu-nt> as the goal symbol succeeds with a parse tree having <var>func</var>.[[ECMAScriptCode]] in the <emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionBody">FunctionBody</a></emu-nt> position and <var>func</var>.[[FormalParameters]] in the <emu-nt><a href="https://tc39.github.io/ecma262#prod-StrictFormalParameters">StrictFormalParameters</a></emu-nt> position, then the string representation must have the syntax of a <emu-nt><a href="https://tc39.github.io/ecma262#prod-ClassExpression">ClassExpression</a></emu-nt>.
+          
+          </li><li>Else, a parse of the string representation using <emu-nt><a href="https://tc39.github.io/ecma262#prod-ClassExpression">ClassExpression</a></emu-nt> as the goal symbol must succeed with a parse tree having <var>func</var>.[[ECMAScriptCode]] in the <emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionBody">FunctionBody</a></emu-nt> position of the constructor method and <var>func</var>.[[FormalParameters]] in the <emu-nt><a href="https://tc39.github.io/ecma262#prod-StrictFormalParameters">StrictFormalParameters</a></emu-nt> position of the constructor method.
+        
+        </li></ul>
+      </li><li>Else if <var>func</var> was defined using <emu-nt><a href="https://tc39.github.io/ecma262#prod-GeneratorExpression">GeneratorExpression</a></emu-nt> or <emu-nt><a href="https://tc39.github.io/ecma262#prod-GeneratorDeclaration">GeneratorDeclaration</a></emu-nt>, then a parse of the string representation using <emu-nt><a href="https://tc39.github.io/ecma262#prod-GeneratorExpression">GeneratorExpression</a></emu-nt> as the goal symbol must succeed with a parse tree having <var>func</var>.[[ECMAScriptCode]] in the <emu-nt><a href="https://tc39.github.io/ecma262#prod-GeneratorBody">GeneratorBody</a></emu-nt> position and <var>func</var>.[[FormalParameters]] in the <emu-nt><a href="https://tc39.github.io/ecma262#prod-FormalParameters">FormalParameters</a></emu-nt> position.
+      
+      </li><li>Else if <var>func</var> was defined using <emu-nt><a href="https://tc39.github.io/ecma262#prod-ArrowFunction">ArrowFunction</a></emu-nt>, then a parse of the string representation using <emu-nt><a href="https://tc39.github.io/ecma262#prod-ArrowFunction">ArrowFunction</a></emu-nt> as the goal symbol must succeed with a parse tree having <var>func</var>.[[ECMAScriptCode]] in the <emu-nt><a href="https://tc39.github.io/ecma262#prod-ConciseBody">ConciseBody</a></emu-nt> position and <var>func</var>.[[FormalParameters]] as CoveredFormalsList of the parse tree in the <emu-nt><a href="https://tc39.github.io/ecma262#prod-ArrowParameters">ArrowParameters</a></emu-nt> position.
+      
+      </li><li>Else if <var>func</var> was defined using <emu-nt><a href="https://tc39.github.io/ecma262#prod-GeneratorMethod">GeneratorMethod</a></emu-nt>, then a parse of the string representation using <emu-nt><a href="https://tc39.github.io/ecma262#prod-GeneratorMethod">GeneratorMethod</a></emu-nt> as the goal symbol must succeed with a parse tree having <var>func</var>.[[ECMAScriptCode]] in the <emu-nt><a href="https://tc39.github.io/ecma262#prod-GeneratorBody">GeneratorBody</a></emu-nt> position and <var>func</var>.[[FormalParameters]] in the <emu-nt><a href="https://tc39.github.io/ecma262#prod-StrictFormalParameters">StrictFormalParameters</a></emu-nt> position.
+      
+      </li><li>Else if <var>func</var> was defined using <emu-nt><a href="#prod-Getter">Getter</a></emu-nt>, then a parse of the string representation using <emu-nt><a href="#prod-Getter">Getter</a></emu-nt> as the goal symbol must succeed with a parse tree having <var>func</var>.[[ECMAScriptCode]] in the <emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionBody">FunctionBody</a></emu-nt> position.
+      
+      </li><li>Else if <var>func</var> was defined using <emu-nt><a href="#prod-Setter">Setter</a></emu-nt>, then a parse of the string representation using <emu-nt><a href="#prod-Setter">Setter</a></emu-nt> as the goal symbol must succeed with a parse tree having <var>func</var>.[[ECMAScriptCode]] in the <emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionBody">FunctionBody</a></emu-nt> position and <var>func</var>.[[FormalParameters]] in the <emu-nt><a href="https://tc39.github.io/ecma262#prod-PropertySetParameterList">PropertySetParameterList</a></emu-nt> position.
+      
+      </li><li>Else if <var>func</var> was defined using <emu-nt><a href="#prod-MethodDefinition">MethodDefinition</a></emu-nt>, then a parse of the string representation using <emu-nt><a href="#prod-MethodDefinition">MethodDefinition</a></emu-nt> as the goal symbol must succeed with a parse tree having <var>func</var>.[[ECMAScriptCode]] in the <emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionBody">FunctionBody</a></emu-nt> position and <var>func</var>.[[FormalParameters]] in the <emu-nt><a href="https://tc39.github.io/ecma262#prod-StrictFormalParameters">StrictFormalParameters</a></emu-nt> position.
+      
+      </li><li>Else if <var>func</var> has an [[ECMAScriptCode]] internal slot, then a parse of the string representation using <emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionExpression">FunctionExpression</a></emu-nt> as the goal symbol must succeed with a parse tree having <var>func</var>.[[ECMAScriptCode]] in the <emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionBody">FunctionBody</a></emu-nt> position. If <var>func</var> has a [[FormalParameters]] internal slot, then additionally a parse of the string representation using <emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionExpression">FunctionExpression</a></emu-nt> as the goal symbol must succeed with a parse tree having <var>func</var>.[[FormalParameters]] in the <emu-nt><a href="https://tc39.github.io/ecma262#prod-FormalParameters">FormalParameters</a></emu-nt> position.
+      
+      </li><li>Else, the string representation must have the syntax of a <emu-nt><a href="#prod-NativeFunction">NativeFunction</a></emu-nt>.
+      
+      <emu-note><span class="note">Note 1</span>If we want to be more explicit here, I can have <emu-xref aoid="FunctionInitialize"><a href="https://tc39.github.io/ecma262#sec-functioninitialize">FunctionInitialize</a></emu-xref>/<emu-xref aoid="FunctionCreate"><a href="https://tc39.github.io/ecma262#sec-functioncreate">FunctionCreate</a></emu-xref> set an internal slot with info about the original representation</emu-note>
+      <emu-note><span class="note">Note 2</span>Do we preserve function name? If so, do unnamed FDs and CDs in export default position cause problems here?</emu-note>
+      <emu-note><span class="note">Note 3</span>Functions created using the Function constructor are not defined using ECMAScript code, but do have an [[ECMAScriptCode]] internal slot.</emu-note>
+    </li></ul>
+
+    <emu-grammar><emu-production name="NativeFunction" id="prod-NativeFunction">
+    <emu-nt><a href="#prod-NativeFunction">NativeFunction</a></emu-nt><emu-geq>:</emu-geq><emu-rhs a="3fb7b81c"><emu-t>function</emu-t><emu-nt optional=""><a href="https://tc39.github.io/ecma262#prod-BindingIdentifier">BindingIdentifier</a><emu-mods><emu-opt>opt</emu-opt></emu-mods></emu-nt><emu-t>(</emu-t><emu-nt><a href="https://tc39.github.io/ecma262#prod-FormalParameters">FormalParameters</a></emu-nt><emu-t>)</emu-t><emu-t>{</emu-t><emu-t>[</emu-t><emu-t>native</emu-t><emu-t>code</emu-t><emu-t>]</emu-t><emu-t>}</emu-t></emu-rhs>
+</emu-production></emu-grammar>
+  </ins>
+</emu-clause>
+
+<!-- es6num="14.3" -->
+<emu-clause id="sec-method-definitions">
+<h1><span class="secnum">2</span>(<a href="http://tc39.github.io/ecma262/#sec-method-definitions">14.3</a>) Method Definitions<span class="utils"><span class="anchor"><a href="#sec-method-definitions">#</a></span></span></h1>
+  <h2>Syntax</h2>
+
+  <del class="block">
+    <emu-grammar><emu-production name="MethodDefinition" params="Yield" id="prod-MethodDefinition">
+    <emu-nt params="Yield"><a href="#prod-MethodDefinition">MethodDefinition</a><emu-mods><emu-params>[Yield]</emu-params></emu-mods></emu-nt><emu-geq>:</emu-geq><emu-rhs a="5c28c96f"><emu-nt params="?Yield"><a href="https://tc39.github.io/ecma262#prod-PropertyName">PropertyName</a><emu-mods><emu-params>[?Yield]</emu-params></emu-mods></emu-nt><emu-t>(</emu-t><emu-nt><a href="https://tc39.github.io/ecma262#prod-StrictFormalParameters">StrictFormalParameters</a></emu-nt><emu-t>)</emu-t><emu-t>{</emu-t><emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionBody">FunctionBody</a></emu-nt><emu-t>}</emu-t></emu-rhs>
+    <emu-rhs a="7dafbe5a"><emu-nt params="?Yield"><a href="https://tc39.github.io/ecma262#prod-GeneratorMethod">GeneratorMethod</a><emu-mods><emu-params>[?Yield]</emu-params></emu-mods></emu-nt></emu-rhs>
+    <emu-rhs a="3a410e0c"><emu-t>get</emu-t><emu-nt params="?Yield"><a href="https://tc39.github.io/ecma262#prod-PropertyName">PropertyName</a><emu-mods><emu-params>[?Yield]</emu-params></emu-mods></emu-nt><emu-t>(</emu-t><emu-t>)</emu-t><emu-t>{</emu-t><emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionBody">FunctionBody</a></emu-nt><emu-t>}</emu-t></emu-rhs>
+    <emu-rhs a="1f33fd7a"><emu-t>set</emu-t><emu-nt params="?Yield"><a href="https://tc39.github.io/ecma262#prod-PropertyName">PropertyName</a><emu-mods><emu-params>[?Yield]</emu-params></emu-mods></emu-nt><emu-t>(</emu-t><emu-nt><a href="https://tc39.github.io/ecma262#prod-PropertySetParameterList">PropertySetParameterList</a></emu-nt><emu-t>)</emu-t><emu-t>{</emu-t><emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionBody">FunctionBody</a></emu-nt><emu-t>}</emu-t></emu-rhs>
+</emu-production></emu-grammar>
+  </del>
+
+  <ins class="block">
+    <emu-grammar><emu-production name="MethodDefinition" params="Yield">
+    <emu-nt params="Yield"><a href="#prod-MethodDefinition">MethodDefinition</a><emu-mods><emu-params>[Yield]</emu-params></emu-mods></emu-nt><emu-geq>:</emu-geq><emu-rhs a="5c28c96f"><emu-nt params="?Yield"><a href="https://tc39.github.io/ecma262#prod-PropertyName">PropertyName</a><emu-mods><emu-params>[?Yield]</emu-params></emu-mods></emu-nt><emu-t>(</emu-t><emu-nt><a href="https://tc39.github.io/ecma262#prod-StrictFormalParameters">StrictFormalParameters</a></emu-nt><emu-t>)</emu-t><emu-t>{</emu-t><emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionBody">FunctionBody</a></emu-nt><emu-t>}</emu-t></emu-rhs>
+    <emu-rhs a="7dafbe5a"><emu-nt params="?Yield"><a href="https://tc39.github.io/ecma262#prod-GeneratorMethod">GeneratorMethod</a><emu-mods><emu-params>[?Yield]</emu-params></emu-mods></emu-nt></emu-rhs>
+    <emu-rhs a="502d943f"><emu-nt params="?Yield"><a href="#prod-Getter">Getter</a><emu-mods><emu-params>[?Yield]</emu-params></emu-mods></emu-nt></emu-rhs>
+    <emu-rhs a="14276cb2"><emu-nt params="?Yield"><a href="#prod-Setter">Setter</a><emu-mods><emu-params>[?Yield]</emu-params></emu-mods></emu-nt></emu-rhs>
+</emu-production>
+<emu-production name="Getter" params="Yield" id="prod-Getter">
+    <emu-nt params="Yield"><a href="#prod-Getter">Getter</a><emu-mods><emu-params>[Yield]</emu-params></emu-mods></emu-nt><emu-geq>:</emu-geq><emu-rhs a="3a410e0c"><emu-t>get</emu-t><emu-nt params="?Yield"><a href="https://tc39.github.io/ecma262#prod-PropertyName">PropertyName</a><emu-mods><emu-params>[?Yield]</emu-params></emu-mods></emu-nt><emu-t>(</emu-t><emu-t>)</emu-t><emu-t>{</emu-t><emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionBody">FunctionBody</a></emu-nt><emu-t>}</emu-t></emu-rhs>
+</emu-production>
+<emu-production name="Setter" params="Yield" id="prod-Setter">
+    <emu-nt params="Yield"><a href="#prod-Setter">Setter</a><emu-mods><emu-params>[Yield]</emu-params></emu-mods></emu-nt><emu-geq>:</emu-geq><emu-rhs a="1f33fd7a"><emu-t>set</emu-t><emu-nt params="?Yield"><a href="https://tc39.github.io/ecma262#prod-PropertyName">PropertyName</a><emu-mods><emu-params>[?Yield]</emu-params></emu-mods></emu-nt><emu-t>(</emu-t><emu-nt><a href="https://tc39.github.io/ecma262#prod-PropertySetParameterList">PropertySetParameterList</a></emu-nt><emu-t>)</emu-t><emu-t>{</emu-t><emu-nt><a href="https://tc39.github.io/ecma262#prod-FunctionBody">FunctionBody</a></emu-nt><emu-t>}</emu-t></emu-rhs>
+</emu-production></emu-grammar>
+  </ins>
+
+  <emu-note><span class="note">Note</span>Other existing references to the 3rd and 4th alternatives in the MethodDefinition grammar will need to be changed.</emu-note>
+</emu-clause><emu-annex id="sec-copyright-and-software-license">
+      <h1><span class="secnum">A</span>Copyright &amp; Software License<span class="utils"><span class="anchor"><a href="#sec-copyright-and-software-license">#</a></span></span></h1>
+      
+      <h2>Copyright Notice</h2>
+      <p>© 2016 Michael Ficarra</p>
+
+      <h2>Software License</h2>
+      <p>All Software contained in this document ("Software") is protected by copyright and is being made available under the "BSD License", included below. This Software may be subject to third party rights (rights from parties other than Ecma International), including patent rights, and no licenses under such third party rights are granted under this license even if the third party concerned is a member of Ecma International. SEE THE ECMA CODE OF CONDUCT IN PATENT MATTERS AVAILABLE AT http://www.ecma-international.org/memento/codeofconduct.htm FOR INFORMATION REGARDING THE LICENSING OF PATENT CLAIMS THAT ARE REQUIRED TO IMPLEMENT ECMA INTERNATIONAL STANDARDS.</p>
+
+<p>Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:</p>
+
+<ol>
+  <li>Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.</li>
+  <li>Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.</li>
+  <li>Neither the name of the authors nor Ecma International may be used to endorse or promote products derived from this software without specific prior written permission.</li>
+</ol>
+
+<p>THIS SOFTWARE IS PROVIDED BY THE ECMA INTERNATIONAL "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL ECMA INTERNATIONAL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+
+    </emu-annex>
+</body>
